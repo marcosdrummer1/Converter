@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL to Audio Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+        }
+
+        audio {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>URL to Audio Converter</h1>
+    <textarea id="urlInput" placeholder="Paste the URL here"></textarea>
+    <br>
+    <label for="audioFormat">Select Audio Format:</label>
+    <select id="audioFormat">
+        <option value="mp3">MP3</option>
+        <option value="wav">WAV</option>
+        <option value="mp4">MP4</option>
+    </select>
+    <br>
+    <button onclick="convertToAudio()">Convert to Audio</button>
+    <br>
+    <audio controls id="audioOutput"></audio>
+
+    <script>
+        async function convertToAudio() {
+            var urlInput = document.getElementById('urlInput').value.trim();
+            var audioOutput = document.getElementById('audioOutput');
+            var selectedFormat = document.getElementById('audioFormat').value;
+
+            if (urlInput === '') {
+                alert('Please enter a valid URL.');
+                return;
+            }
+
+            try {
+                // Fetch the content from the URL
+                var response = await fetch(urlInput);
+                var text = await response.text();
+
+                // Convert the text to speech using the Web Speech API
+                var synth = window.speechSynthesis;
+                var utterance = new SpeechSynthesisUtterance(text);
+
+                // Create a blob with the audio content
+                var blob = new Blob([text], { type: `audio/${selectedFormat}` });
+
+                // Create an object URL from the blob
+                var audioUrl = URL.createObjectURL(blob);
+
+                // Set the audio source and play it
+                audioOutput.src = audioUrl;
+                audioOutput.play();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please check if the URL is valid and accessible.');
+            }
+        }
+    </script>
+</body>
+</html>
+4
